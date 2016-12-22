@@ -11,7 +11,8 @@ import concat from 'gulp-concat'
 import rev from 'gulp-rev'
 import uglify from 'gulp-uglify';
 import del from 'del';
-
+import sourcemaps from 'gulp-sourcemaps'
+import inject from 'gulp-inject'
 
 var reload = browserSync.reload;
 
@@ -29,9 +30,18 @@ gulp.task('clean', () =>{
   });
 });
 
+gulp.task('inject-css', function () {
+  var target = gulp.src('./src/index.html');
+  // It's not necessary to read the files (will speed up things), we're only after their paths: 
+  var sources = gulp.src(['./src/**/*.scss', './src/**/*.css'], {read: false});
+ 
+  return target.pipe(inject(sources))
+    .pipe(gulp.dest('./src'));
+});
+
 
 gulp.task('sass', () => {
-  gulp.src('src/assets/styles/*.scss')
+  gulp.src('src/**/*.scss')
     .pipe(sass())
     .pipe(autoprefixer())
     .pipe(concat('app.css'))
@@ -43,8 +53,10 @@ gulp.task('sass', () => {
 
 gulp.task('babel', () => {
   gulp.src('src/app/**/*.js')
+    .pipe(sourcemaps.init())
     .pipe(babel())
     .pipe(concat('app.js'))
+    .pipe(sourcemaps.write('maps'))
     .pipe(rev())
     .pipe(gulp.dest('dist/js'))
     .pipe(notify({ message: 'babel task complete' }));
@@ -65,15 +77,14 @@ gulp.task('serve', ['sass', 'babel'], () => {
   gulp.watch("src/app/*.js", ['js-watch']);
 });
 
-gulp.task('default', ['serve']);
 
 gulp.task('watch', () => {
-  gulp.watch('src/assets/styles/*.scss', ['sass']);
+  gulp.watch('src/**/*.scss', ['sass']);
   gulp.watch('src/app/**/*.js', ['babel']);
 })
 
 
 gulp.task('build', () => {
-  gulp.watch('src/assets/styles/*.scss', ['sass']);
+  gulp.watch('src/**/*.scss', ['sass']);
   gulp.watch('src/app/**/*.js', ['babel']);
 })
