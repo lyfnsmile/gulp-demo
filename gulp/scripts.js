@@ -18,7 +18,7 @@ gulp.task('scripts', function() {
   return buildScripts();
 });
 
-function buildScripts() {
+let buildScripts=() =>{
   return gulp.src(path.join(conf.src, '/app/**/*.js'))
     .pipe($.eslint())
     .pipe($.eslint.format())
