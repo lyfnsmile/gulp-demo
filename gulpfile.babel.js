@@ -88,3 +88,9 @@ gulp.task('build', () => {
   gulp.watch('src/**/*.scss', ['sass']);
   gulp.watch('src/app/**/*.js', ['babel']);
 })
+
+
+
+gulp.task('default',['clean'],function(){
+  gulp.start('build')
+})
